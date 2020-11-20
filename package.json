@@ -1,0 +1,37 @@
+{
+  "name": "vooks",
+  "description": "Turning books into thoughts",
+  "version": "0.0.0",
+  "author": {
+    "name": "Borja Leiva",
+    "email": "hi@borja.ai",
+    "url": "https://borja.ai"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@chakra-ui/core": "^0.8.0",
+    "@emotion/core": "^10.0.35",
+    "@emotion/styled": "^10.0.27",
+    "emotion-theming": "^10.0.27",
+    "next": "9.5.3",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-icons": "^3.11.0",
+    "firebase": "^7.15.5",
+    "firebase-admin": "^8.12.1",
+    "js-cookie": "2.2.1",
+    "react-firebaseui": "4.1.0",
+    "swr": "0.2.3"
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "none"
+  }
+}
