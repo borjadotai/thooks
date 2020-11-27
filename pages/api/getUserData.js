@@ -33,13 +33,17 @@ const fetchUserData = async (id) => {
   return userData;
 };
 
-export const mapUserData = async (user) => {
-  const { uid, email } = user;
-  const token = await user.getIdToken(true);
-  const userProfile = await fetchUserData(uid);
-  return {
-    id: uid,
-    token,
-    profile: { ...userProfile[0], email }
-  };
+const getUserData = async (req, res) => {
+  const id = req.headers.token;
+
+  try {
+    const userData = await fetchUserData(id);
+    return res.status(200).json({
+      userData: userData
+    });
+  } catch (error) {
+    return res.status(401).send('You are unauthorised');
+  }
 };
+
+export default getUserData;

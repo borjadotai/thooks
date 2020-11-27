@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -12,21 +12,26 @@ import { mapUserData } from './mapUserData';
 
 initFirebase();
 
-const useUser = () => {
+const UserContext = createContext();
+
+const UserStore = ({ children }) => {
   const [user, setUser] = useState();
   const router = useRouter();
 
-  const logout = async () => {
-    return firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        // Sign-out successful.
-        router.push('/');
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+  const userActions = {
+    updateUserInfo: (newData) => setUser({ ...user, profile: newData }),
+    logout: async () => {
+      return firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          // Sign-out successful.
+          router.push('/');
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
   };
 
   useEffect(() => {
@@ -59,7 +64,13 @@ const useUser = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { user, logout };
+  return (
+    <UserContext.Provider value={{ user, userActions }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
-export { useUser };
+const useUser = () => useContext(UserContext);
+
+export { UserStore, useUser, UserContext };

@@ -11,6 +11,8 @@ import Head from 'next/head';
 import theme from '../styles/theme';
 import { prismLightTheme, prismDarkTheme } from '../styles/prism';
 
+import { UserStore } from '../utils/auth/useUser';
+
 const GlobalStyle = ({ children }) => {
   const { colorMode } = useColorMode();
 
@@ -56,7 +58,9 @@ const App = ({ Component, pageProps }) => (
           <meta content="#ffffff" name="theme-color" />
           <meta content="#ffffff" name="msapplication-TileColor" />
         </Head>
-        <Component {...pageProps} />
+        <UserStore>
+          <Component {...pageProps} />
+        </UserStore>
       </GlobalStyle>
     </ColorModeProvider>
   </ThemeProvider>

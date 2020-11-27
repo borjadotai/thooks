@@ -1,33 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import { Formik, Form, Field } from 'formik';
+import { useDropzone } from 'react-dropzone';
 import {
   Heading,
   Box,
   Input,
-  Text,
   Textarea,
   Button,
-  Flex
+  SimpleGrid,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Flex,
+  Text
 } from '@chakra-ui/core';
+import { AiOutlineUpload } from 'react-icons/ai';
 
 import { useUser } from '../utils/auth/useUser';
+import storage from '../utils/storage/storage';
+import isUsernameAvailable from '../utils/users/isUsernameAvailable';
+import { updateUserInfo } from '../utils/firestore/UpdateUserInfo';
 import Container from '../components/Container';
 
-const EditProfile = () => {
-  const { user } = useUser();
-
-  const [form, setForm] = useState({
-    name: null,
-    email: user && user.email ? user.email : null,
-    username: null,
-    pic: null,
-    bio: null
+const UploadComponent = (props) => {
+  const { setFieldValue } = props;
+  const [picName, setPicName] = useState();
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop: (acceptedFiles) => {
+      let fileToUpload = acceptedFiles[0];
+      setPicName(fileToUpload.name);
+      storage.ref(`/profile/${props.user}`).put(fileToUpload);
+      storage
+        .ref(`/profile/${props.user}`)
+        .getDownloadURL()
+        .then((url) => setFieldValue('pic', url));
+    }
   });
 
-  useEffect(() => {
-    setForm({ ...form, email: user && user.email });
-  }, [user]);
+  return (
+    <Box
+      borderWidth="1px"
+      borderRadius="lg"
+      borderStyle="dashed"
+      borderColor="white"
+      minH={20}
+      {...getRootProps({ className: 'dropzone' })}
+    >
+      <input {...getInputProps()} />
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        py={3}
+      >
+        <AiOutlineUpload style={{ height: '2rem', width: '2rem' }} />
+        <Text>
+          {picName ? picName : 'Drop your picture here or click to upload'}
+        </Text>
+      </Flex>
+    </Box>
+  );
+};
 
-  const handleChange = (p, e) => setForm({ ...form, [p]: e.target.value });
+const EditProfile = () => {
+  const router = useRouter();
+  let { user, userActions } = useUser();
+
+  const handleSubmission = (values) => {
+    userActions.updateUserInfo(values);
+    updateUserInfo(user.id, values);
+    router.push('/');
+  };
 
   return (
     <Container>
@@ -37,46 +82,153 @@ const EditProfile = () => {
         bg="gray.800"
         p={[5, 10]}
         borderRadius="lg"
+        mb={10}
       >
         <Heading mb={5} size="lg">
           Edit your profile
         </Heading>
-        {console.log('form', form)}
-        <Text mb={1}>Name</Text>
-        <Input
-          mb={5}
-          placeholder="i.e: John Smith"
-          onChange={(e) => handleChange('name', e)}
-        />
-        <Text mb={1}>Email</Text>
-        <Input
-          mb={5}
-          value={form.email}
-          placeholder="i.e: johnsmith@thooks.me"
-          onChange={(e) => handleChange('email', e)}
-        />
-        <Text mb={1}>Username</Text>
-        <Input
-          mb={5}
-          placeholder="i.e: johnsmith"
-          onChange={(e) => handleChange('username', e)}
-        />
-        <Text mb={1}>Profile picture url</Text>
-        <Input
-          mb={5}
-          placeholder="i.e: https://images.com/asd3qf3q"
-          onChange={(e) => handleChange('pic', e)}
-        />
-        <Text mb={1}>Bio</Text>
-        <Textarea
-          placeholder="Entrepreneur. Rocket scientist. Padel player. Cat lover."
-          onChange={(e) => handleChange('bio', e)}
-        />
-        <Flex mt={5} justifyContent="flex-end">
-          <Button width="100%" variant="outline">
-            Apply changes
-          </Button>
-        </Flex>
+        <Formik
+          initialValues={{ ...(user && user.profile) }}
+          validate={async (values) => {
+            let usernameAvailable = await isUsernameAvailable(values.username);
+            const errors = {};
+            if (!values.name) {
+              errors.name = 'Please enter your name';
+            }
+            if (!values.email) {
+              errors.email = 'Please enter your email';
+            }
+            if (!values.username) {
+              errors.username = 'Please choose a username';
+            } else {
+              if (
+                !usernameAvailable &&
+                values.username !== user.profile.username
+              ) {
+                errors.username =
+                  'Sadly someone already has that username, please pick another one';
+              }
+            }
+            return errors;
+          }}
+          onSubmit={(values, actions) => {
+            setTimeout(() => {
+              handleSubmission(values);
+              actions.setSubmitting(false);
+            }, 1000);
+          }}
+        >
+          {({ values, isSubmitting, setFieldValue }) => (
+            <Form>
+              {console.log(values)}
+              <Field name="name">
+                {({ field, form }) => (
+                  <FormControl
+                    id="name"
+                    mb={5}
+                    isRequired
+                    isInvalid={form.errors.name && form.touched.name}
+                  >
+                    <FormLabel htmlFor="name">Name</FormLabel>
+                    <Input
+                      {...field}
+                      id="name"
+                      placeholder="John Smith"
+                      errorBorderColor="red.500"
+                    />
+                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="email">
+                {({ field, form }) => (
+                  <FormControl
+                    id="email"
+                    mb={5}
+                    isRequired
+                    isInvalid={form.errors.email && form.touched.email}
+                  >
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <Input {...field} id="email" isDisabled />
+                    <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="username">
+                {({ field, form }) => (
+                  <FormControl
+                    id="username"
+                    mb={5}
+                    isRequired
+                    isInvalid={form.errors.username && form.touched.username}
+                  >
+                    <FormLabel htmlFor="username">Username</FormLabel>
+                    <Input
+                      {...field}
+                      id="username"
+                      placeholder="johnsmith"
+                      errorBorderColor="red.500"
+                    />
+                    <FormErrorMessage>{form.errors.username}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="pic">
+                {({ form }) => (
+                  <FormControl
+                    id="pic"
+                    mb={5}
+                    isInvalid={form.errors.pic && form.touched.pic}
+                  >
+                    <FormLabel htmlFor="pic">Profile picture</FormLabel>
+                    <UploadComponent
+                      user={user && user.id}
+                      setFieldValue={setFieldValue}
+                    />
+                    <FormErrorMessage>{form.errors.pic}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="bio">
+                {({ field, form }) => (
+                  <FormControl
+                    id="bio"
+                    mb={5}
+                    isInvalid={form.errors.bio && form.touched.bio}
+                  >
+                    <FormLabel htmlFor="bio">Bio</FormLabel>
+                    <Textarea
+                      {...field}
+                      id="bio"
+                      placeholder="Entrepreneur. Rocket scientist. Padel player. Cat lover."
+                      errorBorderColor="red.500"
+                    />
+                    <FormErrorMessage>{form.errors.bio}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+
+              <SimpleGrid mt={5} columns={2} spacing={10}>
+                <Button
+                  width="100%"
+                  variant="outline"
+                  isDisabled={!values.name || !values.username}
+                  onClick={() => router.push('/')}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  width="100%"
+                  variant="solid"
+                  isLoading={isSubmitting}
+                  type="submit"
+                >
+                  Apply changes
+                </Button>
+              </SimpleGrid>
+            </Form>
+          )}
+        </Formik>
       </Box>
     </Container>
   );

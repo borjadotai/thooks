@@ -10,26 +10,26 @@ import {
 import { useUser } from '../utils/auth/useUser';
 
 const Menu = () => {
-  const { user, logout } = useUser();
+  const { isLoggedIn, user, userActions } = useUser();
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <Stack align="center" justify="center" mt="20vh">
-      {user && (
+      {isLoggedIn && (
         <NextLink href="/new" passHref>
           <Heading letterSpacing="tight" mb={12} as="a" size="xl">
             New vook
           </Heading>
         </NextLink>
       )}
-      {user && (
-        <Button variant="link" p={[1, 4]} onClick={() => logout()}>
+      {isLoggedIn && (
+        <Button variant="link" p={[1, 4]} onClick={() => userActions.logout()}>
           <Heading letterSpacing="tight" mb={10} size="xl">
             Logout
           </Heading>
         </Button>
       )}
-      {!user && (
+      {!isLoggedIn && (
         <NextLink href="/auth" passHref>
           <Button as="a" variant="outline" p={[1, 4]}>
             Sign In

@@ -29,7 +29,7 @@ const StickyNav = styled(Flex)`
 `;
 
 const Container = ({ children }) => {
-  const { user, logout } = useUser();
+  const { user, userActions } = useUser();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -76,12 +76,16 @@ const Container = ({ children }) => {
             {user && (
               <NextLink href="/new" passHref>
                 <Button as="a" variant="ghost" p={[1, 4]}>
-                  New vook
+                  New thook
                 </Button>
               </NextLink>
             )}
             {user && (
-              <Button variant="ghost" p={[1, 4]} onClick={() => logout()}>
+              <Button
+                variant="ghost"
+                p={[1, 4]}
+                onClick={() => userActions.logout()}
+              >
                 Logout
               </Button>
             )}

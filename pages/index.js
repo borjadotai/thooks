@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box } from '@chakra-ui/core';
 
 import { useUser } from '../utils/auth/useUser';
@@ -8,7 +8,7 @@ import Profile from '../components/Profile';
 import Landing from '../components/Landing';
 
 const Index = () => {
-  const { user, logout } = useUser();
+  const { user } = useUser();
 
   return (
     <Container>
