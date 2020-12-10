@@ -5,10 +5,10 @@ initFirebase();
 
 const db = firebase.firestore();
 
-const doesUsernameExist = async (username) => {
+const doesEmailExist = async (email) => {
   let matchUsers = await new Promise((resolve, reject) => {
     db.collection('users')
-      .where('username', '==', username)
+      .where('email', '==', email)
       .get()
       .then((snapshot) => {
         let data = [];
@@ -33,10 +33,11 @@ const doesUsernameExist = async (username) => {
   return matchUsers.length > 0;
 };
 
-const isUsernameAvailable = async (username) => {
-  const matchUsers = await doesUsernameExist(username);
+const hasEmailBeenUsed = async (email) => {
+  const emailExistsInDb = await doesEmailExist(email);
+  console.log('result', emailExistsInDb);
 
-  return !matchUsers;
+  return emailExistsInDb;
 };
 
-export default isUsernameAvailable;
+export default hasEmailBeenUsed;

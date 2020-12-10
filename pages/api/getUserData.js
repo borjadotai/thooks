@@ -27,6 +27,7 @@ const fetchUserData = async (id) => {
           resolve(data);
         })
         .catch((error) => {
+          console.log(error);
           reject([]);
         });
     }));

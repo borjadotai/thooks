@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 
 import Footer from '../components/Footer';
 import FirebaseAuth from '../components/FirebaseAuth';
+import AuthRoot from '../components/auth/AuthRoot';
 
 import styles from '../styles/styles.module.css';
 
@@ -68,7 +69,7 @@ const Auth = () => {
         px={8}
         py={16}
       >
-        <FirebaseAuth />
+        <AuthRoot />
       </Flex>
       <Footer />
     </>

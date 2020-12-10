@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/router';
 import { Formik, Form, Field } from 'formik';
-import { useDropzone } from 'react-dropzone';
 import {
   Heading,
   Box,
@@ -11,58 +10,14 @@ import {
   SimpleGrid,
   FormControl,
   FormLabel,
-  FormErrorMessage,
-  Flex,
-  Text
+  FormErrorMessage
 } from '@chakra-ui/core';
-import { AiOutlineUpload } from 'react-icons/ai';
 
 import { useUser } from '../utils/auth/useUser';
-import storage from '../utils/storage/storage';
 import isUsernameAvailable from '../utils/users/isUsernameAvailable';
 import { updateUserInfo } from '../utils/firestore/UpdateUserInfo';
 import Container from '../components/Container';
-
-const UploadComponent = (props) => {
-  const { setFieldValue } = props;
-  const [picName, setPicName] = useState();
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
-    onDrop: (acceptedFiles) => {
-      let fileToUpload = acceptedFiles[0];
-      setPicName(fileToUpload.name);
-      storage.ref(`/profile/${props.user}`).put(fileToUpload);
-      storage
-        .ref(`/profile/${props.user}`)
-        .getDownloadURL()
-        .then((url) => setFieldValue('pic', url));
-    }
-  });
-
-  return (
-    <Box
-      borderWidth="1px"
-      borderRadius="lg"
-      borderStyle="dashed"
-      borderColor="white"
-      minH={20}
-      {...getRootProps({ className: 'dropzone' })}
-    >
-      <input {...getInputProps()} />
-      <Flex
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        py={3}
-      >
-        <AiOutlineUpload style={{ height: '2rem', width: '2rem' }} />
-        <Text>
-          {picName ? picName : 'Drop your picture here or click to upload'}
-        </Text>
-      </Flex>
-    </Box>
-  );
-};
+import UploadComponent from '../components/UploadComponent';
 
 const EditProfile = () => {
   const router = useRouter();
@@ -182,8 +137,9 @@ const EditProfile = () => {
                   >
                     <FormLabel htmlFor="pic">Profile picture</FormLabel>
                     <UploadComponent
-                      user={user && user.id}
                       setFieldValue={setFieldValue}
+                      refPath={`/profile/${user && user.id}`}
+                      fieldName="pic"
                     />
                     <FormErrorMessage>{form.errors.pic}</FormErrorMessage>
                   </FormControl>

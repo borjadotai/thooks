@@ -25,6 +25,7 @@ const doesUsernameExist = async (username) => {
         resolve(data);
       })
       .catch((error) => {
+        console.log(error);
         reject([]);
       });
   });

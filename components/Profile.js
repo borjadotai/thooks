@@ -15,6 +15,8 @@ import {
 import { useUser } from '../utils/auth/useUser';
 import storage from '../utils/storage/storage';
 
+import ThooksSection from './Thooks';
+
 const Profile = () => {
   let { user } = useUser();
   let userProfile = user && user.profile;
@@ -54,6 +56,7 @@ const Profile = () => {
               />
               <Flex flexDirection="column" ml={5}>
                 <Heading size="lg">{userProfile.name || 'Anonymous'}</Heading>
+                {console.log(user)}
                 <Heading color="gray.500" size="sm" mt={2}>
                   @{userProfile.username || userProfile.id}
                 </Heading>
@@ -70,38 +73,7 @@ const Profile = () => {
           </Flex>
         )}
       </Box>
-      <SimpleGrid mt={5} minChildWidth="180px" spacing={5}>
-        <Image
-          src="https://images-na.ssl-images-amazon.com/images/I/41nzI1lhIVL._SX327_BO1,204,203,200_.jpg"
-          w={180}
-          h={270}
-          borderRadius="lg"
-        />
-        <Image
-          src="https://images-na.ssl-images-amazon.com/images/I/41YYbVCk+fL._SX352_BO1,204,203,200_.jpg"
-          w={180}
-          h={270}
-          borderRadius="lg"
-        />
-        <Image
-          src="https://images-na.ssl-images-amazon.com/images/I/41YYbVCk+fL._SX352_BO1,204,203,200_.jpg"
-          w={180}
-          h={270}
-          borderRadius="lg"
-        />
-        <Image
-          src="https://images-na.ssl-images-amazon.com/images/I/41YYbVCk+fL._SX352_BO1,204,203,200_.jpg"
-          w={180}
-          h={270}
-          borderRadius="lg"
-        />
-        <Image
-          src="https://images-na.ssl-images-amazon.com/images/I/41YYbVCk+fL._SX352_BO1,204,203,200_.jpg"
-          w={180}
-          h={270}
-          borderRadius="lg"
-        />
-      </SimpleGrid>
+      <ThooksSection />
     </>
   );
 };

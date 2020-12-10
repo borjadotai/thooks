@@ -7,7 +7,7 @@ import {
   convertFromRaw
 } from 'draft-js';
 
-export default class Editor extends Component {
+export default class TextEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -34,7 +34,10 @@ export default class Editor extends Component {
     };
 
     this.focus = () => this.editor.focus();
-    this.onChange = (editorState) => this.setState({ editorState });
+    this.onChange = (editorState) => {
+      this.setState({ editorState });
+      props.setValue(editorState);
+    };
   }
 
   onClickEditor = () => {
@@ -164,6 +167,7 @@ export default class Editor extends Component {
 
   render() {
     const { editorState } = this.state;
+    // console.log(JSON.stringify(convertToRaw(editorState.getCurrentContent())));
     // Make sure we're not on the ssr
     if (typeof window !== 'undefined') {
       // Let's stick the toolbar to the selection
@@ -205,18 +209,6 @@ export default class Editor extends Component {
               this.editor = element;
             }}
           />
-        </div>
-        <div style={{ marginTop: 40 }}>
-          <button
-            onClick={() =>
-              this.setState({ showRawData: !this.state.showRawData })
-            }
-          >
-            {!this.state.showRawData ? 'Show' : 'Hide'} Raw Data
-          </button>
-          <br />
-          {this.state.showRawData &&
-            JSON.stringify(convertToRaw(editorState.getCurrentContent()))}
         </div>
       </div>
     );

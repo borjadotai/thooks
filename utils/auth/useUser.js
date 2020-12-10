@@ -53,7 +53,7 @@ const UserStore = ({ children }) => {
 
     const userFromCookie = getUserFromCookie();
     if (!userFromCookie) {
-      router.push('/');
+      // router.push('/');
       return;
     }
     setUser(userFromCookie);
